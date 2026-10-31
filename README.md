@@ -2,6 +2,25 @@
 
 Docker Compose config for the services running on the Raspberry Pi 5.
 
+## Changed something? Run this on the Pi
+
+```bash
+cd ~/homelab && ./homelab.sh deploy
+```
+
+That's it. After pushing **any** change to this repo, that one command pulls
+it, applies the host config (Caddy and systemd, asks for your password), then
+downs and ups every service. Safe to run any time; each service is only down
+for a few seconds.
+
+| Other situations                 | Run on the Pi                                                |
+| -------------------------------- | ------------------------------------------------------------ |
+| Get newer image versions         | `./homelab.sh update`                                        |
+| Edited `.env` on the Pi          | `./homelab.sh apply`                                         |
+| Removing a service from the repo | `./homelab.sh down <service>` **before** deleting its folder |
+
+## Services
+
 | Service        | Folder                | LAN                     | Tailnet (HTTPS via Caddy)              |
 | -------------- | --------------------- | ----------------------- | -------------------------------------- |
 | Jellyfin       | `apps/jellyfin`       | `http://pi:8096`        | `https://<TS_HOSTNAME>/jellyfin`       |
@@ -29,7 +48,9 @@ The repo only holds config. Service data lives outside the checkout:
 
 ## Usage (on the Pi)
 
-`homelab.sh` runs a Compose command across every service, or just one:
+For changes to this repo, use `./homelab.sh deploy` (see the top of this
+file). `homelab.sh` also runs individual Compose commands across every
+service, or just one:
 
 ```bash
 ./homelab.sh up                # start everything / apply config changes

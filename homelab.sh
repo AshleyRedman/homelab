@@ -3,6 +3,8 @@
 #
 # Usage: ./homelab.sh <command> [service]
 #
+#   deploy    git pull, then apply (the one command after pushing changes)
+#   apply     apply host config (sudo host/install.sh), then restart all
 #   up        start services, applying any config changes
 #   down      stop and remove containers (data is kept)
 #   restart   down, then up
@@ -13,10 +15,11 @@
 # Services: the folder names in apps/, e.g. ./homelab.sh restart jellyfin
 set -euo pipefail
 
-apps_dir="$(cd "$(dirname "$0")/apps" && pwd)"
+repo_dir="$(cd "$(dirname "$0")" && pwd)"
+apps_dir="$repo_dir/apps"
 
 usage() {
-    sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
 }
 
@@ -28,6 +31,20 @@ compose() {
 
 cmd="${1:-}"
 target="${2:-}"
+
+if [[ "$cmd" == "deploy" ]]; then
+    echo "==> git pull"
+    git -C "$repo_dir" pull --ff-only
+    # Re-exec so the rest runs from the freshly pulled copy of this script.
+    exec "$repo_dir/homelab.sh" apply
+fi
+
+if [[ "$cmd" == "apply" ]]; then
+    echo "==> host config"
+    sudo "$repo_dir/host/install.sh"
+    cmd=restart
+    target=""
+fi
 
 if [[ -n "$target" ]]; then
     if [[ ! -f "$apps_dir/$target/compose.yml" ]]; then

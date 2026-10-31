@@ -19,6 +19,11 @@ if ! grep -qE '^TS_HOSTNAME=.+' "$env_file" 2>/dev/null; then
     exit 1
 fi
 
+if grep -q 'your-tailnet' "$env_file"; then
+    echo "$env_file still has the placeholder TS_HOSTNAME from .env.example. Set the real one." >&2
+    exit 1
+fi
+
 # Point $2 at $host_dir/$1. An existing real file is removed if identical,
 # otherwise kept as <file>.pre-homelab.
 link() {
