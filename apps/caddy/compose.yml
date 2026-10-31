@@ -1,0 +1,36 @@
+name: caddy
+
+# HTTPS reverse proxy for the tailnet hostname (see conf/Caddyfile).
+services:
+    caddy:
+        container_name: caddy
+        image: caddy:latest
+        # Host networking so the Caddyfile can reach every app on localhost,
+        # and Caddy can bind 80/443/8443/8444 directly.
+        network_mode: host
+        environment:
+            - TZ=Europe/London
+        env_file:
+            - ../../.env
+        volumes:
+            # Directory (not single-file) mount so git updates to the Caddyfile
+            # are seen inside the container.
+            - ./conf:/etc/caddy:ro
+            - /mnt/nvme/caddy/data:/data
+            - /mnt/nvme/caddy/config:/config
+            # tailscaled socket, used to get the *.ts.net certificate.
+            - /var/run/tailscale:/var/run/tailscale
+        restart: unless-stopped
+        healthcheck:
+            test:
+                [
+                    'CMD',
+                    'wget',
+                    '-q',
+                    '--spider',
+                    'http://localhost:2019/config/'
+                ]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s

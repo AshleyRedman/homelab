@@ -1,8 +1,8 @@
-# Linked to /etc/caddy/Caddyfile by host/install.sh. Caddy gets TLS certs for
-# *.ts.net from tailscaled automatically.
+# Mounted into the caddy container at /etc/caddy. Caddy gets TLS certs for
+# *.ts.net from the host's tailscaled via its mounted socket.
 #
-# {$TS_HOSTNAME} comes from .env at the repo root (see .env.example), loaded
-# into caddy.service by host/install.sh.
+# {$TS_HOSTNAME} comes from .env at the repo root (see .env.example).
+# Apps are reached on localhost because the container uses host networking.
 
 {$TS_HOSTNAME} {
 	redir /jellyfin /jellyfin/
