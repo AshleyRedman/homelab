@@ -57,11 +57,17 @@ sudo cp host/systemd/docker.service.d/wait-for-media.conf /etc/systemd/system/do
 sudo systemctl daemon-reload
 ```
 
-`network-online.target` only waits for the network if a wait-online service is
-enabled. Check it with:
+### Wait for eth0 before `network-online.target`
+
+The docker drop-in above relies on `network-online.target`, which means
+nothing unless a wait-online service is enabled. netplan marks `eth0` as
+optional, so this override makes the wait explicit (60s cap):
 
 ```bash
-systemctl is-enabled NetworkManager-wait-online.service
+sudo mkdir -p /etc/systemd/system/systemd-networkd-wait-online.service.d
+sudo cp host/systemd/systemd-networkd-wait-online.service.d/wait-for-eth0.conf /etc/systemd/system/systemd-networkd-wait-online.service.d/
+sudo systemctl daemon-reload
+sudo systemctl enable --now systemd-networkd-wait-online.service
 ```
 
 ## One-time migration from `~/<service>` folders
