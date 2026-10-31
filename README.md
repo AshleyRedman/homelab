@@ -2,7 +2,7 @@
 
 Docker Compose config for the services running on the Raspberry Pi 5.
 
-## Changed something? Run this on the Pi
+## Deploy changes
 
 ```bash
 cd ~/homelab && ./homelab.sh deploy
@@ -21,12 +21,12 @@ for a few seconds.
 
 ## Services
 
-| Service        | Folder                | LAN                     | Tailnet (HTTPS via Caddy)              |
-| -------------- | --------------------- | ----------------------- | -------------------------------------- |
-| Jellyfin       | `apps/jellyfin`       | `http://pi:8096`        | `https://<TS_HOSTNAME>/jellyfin`       |
-| Audiobookshelf | `apps/audiobookshelf` | `http://pi:13378`       | `https://<TS_HOSTNAME>/audiobookshelf` |
-| Home Assistant | `apps/home_assistant` | `http://pi:8123`        | `https://<TS_HOSTNAME>:8443`           |
-| Dozzle         | `apps/dozzle`         | `http://pi:8080/dozzle` | `https://<TS_HOSTNAME>/dozzle`         |
+| Service        | Folder                | LAN               | Tailnet (HTTPS via Caddy)              |
+| -------------- | --------------------- | ----------------- | -------------------------------------- |
+| Jellyfin       | `apps/jellyfin`       | `http://pi:8096`  | `https://<TS_HOSTNAME>/jellyfin`       |
+| Audiobookshelf | `apps/audiobookshelf` | `http://pi:13378` | `https://<TS_HOSTNAME>/audiobookshelf` |
+| Home Assistant | `apps/home_assistant` | `http://pi:8123`  | `https://<TS_HOSTNAME>:8443`           |
+| Dozzle         | `apps/dozzle`         | `http://pi:8080`  | `https://<TS_HOSTNAME>:8444`           |
 
 ## Layout
 

@@ -10,8 +10,6 @@ services:
         environment:
             - TZ=Europe/London
             - DOZZLE_HOSTNAME=pi
-            # Served by Caddy at https://<TS_HOSTNAME>/dozzle
-            - DOZZLE_BASE=/dozzle
         volumes:
             - /mnt/nvme/dozzle:/data
             - /var/run/docker.sock:/var/run/docker.sock:ro

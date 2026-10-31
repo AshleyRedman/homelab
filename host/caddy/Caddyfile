@@ -7,7 +7,6 @@
 {$TS_HOSTNAME} {
 	redir /jellyfin /jellyfin/
 	redir /audiobookshelf /audiobookshelf/
-	redir /dozzle /dozzle/
 
 	handle_path /jellyfin/* {
 		reverse_proxy localhost:8096
@@ -17,17 +16,18 @@
 		reverse_proxy localhost:13378
 	}
 
-	# Not handle_path: Dozzle runs with DOZZLE_BASE=/dozzle and expects the prefix.
-	handle /dozzle/* {
-		reverse_proxy localhost:8080
-	}
-
 	handle {
 		respond "Caddy is up." 200
 	}
 }
 
-# Home Assistant does not support running under a sub-path, so it gets its own port.
+# Apps that don't work under a sub-path get their own port instead.
+# Home Assistant
 {$TS_HOSTNAME}:8443 {
 	reverse_proxy localhost:8123
+}
+
+# Dozzle
+{$TS_HOSTNAME}:8444 {
+	reverse_proxy localhost:8080
 }
