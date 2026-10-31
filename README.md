@@ -2,12 +2,12 @@
 
 Docker Compose config for the services running on the Raspberry Pi 5.
 
-| Service        | Folder                | URL                 |
-| -------------- | --------------------- | ------------------- |
-| Jellyfin       | `apps/jellyfin`       | `http://<pi>:8096`  |
-| Audiobookshelf | `apps/audiobookshelf` | `http://<pi>:13378` |
-| Home Assistant | `apps/home_assistant` | `http://<pi>:8123`  |
-| Dozzle         | `apps/dozzle`         | `http://<pi>:8080`  |
+| Service        | Folder                | LAN                     | Tailnet (HTTPS via Caddy)              |
+| -------------- | --------------------- | ----------------------- | -------------------------------------- |
+| Jellyfin       | `apps/jellyfin`       | `http://pi:8096`        | `https://<TS_HOSTNAME>/jellyfin`       |
+| Audiobookshelf | `apps/audiobookshelf` | `http://pi:13378`       | `https://<TS_HOSTNAME>/audiobookshelf` |
+| Home Assistant | `apps/home_assistant` | `http://pi:8123`        | `https://<TS_HOSTNAME>:8443`           |
+| Dozzle         | `apps/dozzle`         | `http://pi:8080/dozzle` | `https://<TS_HOSTNAME>/dozzle`         |
 
 ## Layout
 
@@ -46,30 +46,35 @@ Each service is still its own Compose project, so `docker compose` inside
 
 ## Host setup
 
-### Start Docker after the UNAS share is mounted
+Config for the Pi itself lives in `host/` and is **symlinked** into place, so
+the system reads it straight from this checkout:
 
-Without this, Jellyfin and Audiobookshelf fail at boot with
-`open /mnt/media: no such device`. Docker starts before the NFS mount is ready
-and doesn't retry.
+| Repo file                                                                | Linked at                                                     | Why                                                                                                                                   |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `host/caddy/Caddyfile`                                                   | `/etc/caddy/Caddyfile`                                        | HTTPS on the tailnet name (Caddy is installed via apt, not Docker)                                                                    |
+| `host/systemd/docker.service.d/wait-for-media.conf`                      | `/etc/systemd/system/docker.service.d/`                       | Start Docker after the UNAS share mounts. Without it, Jellyfin and Audiobookshelf fail at boot with `open /mnt/media: no such device` |
+| `host/systemd/systemd-networkd-wait-online.service.d/wait-for-eth0.conf` | `/etc/systemd/system/systemd-networkd-wait-online.service.d/` | Make `network-online.target` wait for eth0 (netplan marks it optional, so it otherwise doesn't wait)                                  |
 
-```bash
-sudo mkdir -p /etc/systemd/system/docker.service.d
-sudo cp host/systemd/docker.service.d/wait-for-media.conf /etc/systemd/system/docker.service.d/
-sudo systemctl daemon-reload
-```
-
-### Wait for eth0 before `network-online.target`
-
-The docker drop-in above relies on `network-online.target`, which means
-nothing unless a wait-online service is enabled. netplan marks `eth0` as
-optional, so this override makes the wait explicit (60s cap):
+Private values (e.g. the tailnet hostname) live in a gitignored `.env` at the
+repo root. Create it once:
 
 ```bash
-sudo mkdir -p /etc/systemd/system/systemd-networkd-wait-online.service.d
-sudo cp host/systemd/systemd-networkd-wait-online.service.d/wait-for-eth0.conf /etc/systemd/system/systemd-networkd-wait-online.service.d/
-sudo systemctl daemon-reload
-sudo systemctl enable --now systemd-networkd-wait-online.service
+cp .env.example .env && nano .env
 ```
+
+Then set up the links. Re-run this after pulling changes to `host/` or `.env`:
+
+```bash
+sudo ./host/install.sh
+```
+
+It's safe to re-run. It reloads systemd and Caddy, gives the `caddy` user
+read access to the checkout, and loads `.env` into `caddy.service` via
+`/etc/systemd/system/caddy.service.d/homelab-env.conf`. If the Caddyfile is invalid, Caddy keeps serving
+its previous config.
+
+Because these are links, moving or deleting `~/homelab` breaks them. Re-run
+`install.sh` from the new location.
 
 ## One-time migration from `~/<service>` folders
 
