@@ -5,8 +5,7 @@ updates:
     - package-ecosystem: npm
       directory: /
       schedule:
-          interval: weekly
-          day: monday
+          interval: monthly
       # Matches minimumReleaseAge (1 day) in pnpm-workspace.yaml.
       cooldown:
           default-days: 1
@@ -22,8 +21,7 @@ updates:
     - package-ecosystem: github-actions
       directory: /
       schedule:
-          interval: weekly
-          day: monday
+          interval: monthly
       groups:
           actions:
               patterns: ['*']
