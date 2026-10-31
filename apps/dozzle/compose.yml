@@ -1,0 +1,23 @@
+name: dozzle
+
+# Read-only dashboard for container status, resource use and logs.
+# Start/stop/restart actions stay off (DOZZLE_ENABLE_ACTIONS unset), so the
+# repo remains the only way to change containers.
+services:
+    dozzle:
+        container_name: dozzle
+        image: amir20/dozzle:latest
+        environment:
+            - TZ=Europe/London
+            - DOZZLE_HOSTNAME=pi
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        ports:
+            - 8080:8080
+        restart: unless-stopped
+        healthcheck:
+            test: ['CMD', '/dozzle', 'healthcheck']
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s

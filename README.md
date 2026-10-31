@@ -7,6 +7,7 @@ Docker Compose config for the services running on the Raspberry Pi 5.
 | Jellyfin       | `apps/jellyfin`       | `http://<pi>:8096`  |
 | Audiobookshelf | `apps/audiobookshelf` | `http://<pi>:13378` |
 | Home Assistant | `apps/home_assistant` | `http://<pi>:8123`  |
+| Dozzle         | `apps/dozzle`         | `http://<pi>:8080`  |
 
 ## Layout
 
