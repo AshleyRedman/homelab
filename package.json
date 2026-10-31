@@ -1,0 +1,20 @@
+{
+    "name": "homelab",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "fmt": "oxfmt",
+        "fix": "oxfmt --write",
+        "types": "pnpm --recursive types",
+        "check": "oxfmt --check && pnpm types",
+        "update": "pnpm update --interactive --recursive --latest && pnpm skills",
+        "skills": "pnpm dlx skills update"
+    },
+    "devDependencies": {
+        "oxfmt": "^0.75.0"
+    },
+    "engines": {
+        "node": "26.*"
+    },
+    "packageManager": "pnpm@12.16.1"
+}

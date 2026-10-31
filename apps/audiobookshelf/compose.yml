@@ -1,0 +1,27 @@
+name: audiobookshelf
+
+services:
+    audiobookshelf:
+        container_name: audiobookshelf
+        image: ghcr.io/advplyr/audiobookshelf:latest
+        environment:
+            - TZ=Europe/London
+            - PORT=13378
+        volumes:
+            - /mnt/nvme/audiobookshelf/config:/config
+            - /mnt/nvme/audiobookshelf/metadata:/metadata
+            - /mnt/media/audiobooks:/audiobooks
+            - /mnt/media/podcasts:/podcasts
+        ports:
+            - 13378:13378
+        restart: unless-stopped
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'wget -qO- http://localhost:13378/healthcheck || exit 1'
+                ]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 60s

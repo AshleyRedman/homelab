@@ -1,0 +1,12 @@
+packages:
+    - apps/*
+
+minimumReleaseAgeStrict: true
+
+minimumReleaseAge: 1440
+
+blockExoticSubdeps: true
+
+updateConfig:
+    ignoreDependencies:
+        - '@types/node'
