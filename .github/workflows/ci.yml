@@ -1,0 +1,42 @@
+# Catches broken config before it's pulled onto the Pi.
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+permissions:
+    contents: read
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            - uses: pnpm/action-setup@v6
+            - uses: actions/setup-node@v7
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+
+            - name: Formatting
+              run: pnpm check
+
+            - name: Shell scripts
+              run: shellcheck --severity=warning homelab.sh host/install.sh
+
+            - name: Compose files
+              run: |
+                  cp .env.example .env
+                  for f in apps/*/compose.yml; do
+                      echo "$f"
+                      docker compose -f "$f" config --quiet
+                  done
+
+            - name: Caddyfile
+              run: >
+                  docker run --rm -e TS_HOSTNAME=pi.example.ts.net
+                  -v "$PWD/apps/caddy/conf:/etc/caddy:ro"
+                  caddy:latest caddy validate --config /etc/caddy/Caddyfile

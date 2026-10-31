@@ -1,0 +1,33 @@
+version: 2
+
+updates:
+    # Root package.json (oxfmt). pnpm is detected from pnpm-lock.yaml.
+    - package-ecosystem: npm
+      directory: /
+      schedule:
+          interval: weekly
+          day: monday
+      # Matches minimumReleaseAge (1 day) in pnpm-workspace.yaml.
+      cooldown:
+          default-days: 1
+      groups:
+          dev-dependencies:
+              dependency-type: development
+      commit-message:
+          prefix: deps
+      labels:
+          - dependencies
+
+    # Actions used in .github/workflows.
+    - package-ecosystem: github-actions
+      directory: /
+      schedule:
+          interval: weekly
+          day: monday
+      groups:
+          actions:
+              patterns: ['*']
+      commit-message:
+          prefix: ci
+      labels:
+          - dependencies
