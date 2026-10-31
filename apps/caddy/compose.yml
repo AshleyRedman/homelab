@@ -22,13 +22,15 @@ services:
             - /var/run/tailscale:/var/run/tailscale
         restart: unless-stopped
         healthcheck:
+            # 127.0.0.1, not localhost: the admin API listens on IPv4 only and
+            # localhost resolves to ::1 first in the container.
             test:
                 [
                     'CMD',
                     'wget',
-                    '-q',
-                    '--spider',
-                    'http://localhost:2019/config/'
+                    '-qO',
+                    '/dev/null',
+                    'http://127.0.0.1:2019/config/'
                 ]
             interval: 30s
             timeout: 10s
