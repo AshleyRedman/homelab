@@ -6,7 +6,7 @@ services:
         container_name: caddy
         image: caddy:latest
         # Host networking so the Caddyfile can reach every app on localhost,
-        # and Caddy can bind 80/443/8443/8444 directly.
+        # and Caddy can bind 80/443 and its service ports (9001+) directly.
         network_mode: host
         environment:
             - TZ=Europe/London

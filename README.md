@@ -23,22 +23,34 @@ for a few seconds.
 
 | Service        | Folder                | LAN               | Tailnet (HTTPS via Caddy)    |
 | -------------- | --------------------- | ----------------- | ---------------------------- |
+| Dozzle         | `apps/dozzle`         | `http://pi:8080`  | `https://<TS_HOSTNAME>:9001` |
+| Home Assistant | `apps/home_assistant` | `http://pi:8123`  | `https://<TS_HOSTNAME>:9002` |
 | Jellyfin       | `apps/jellyfin`       | `http://pi:8096`  | `https://<TS_HOSTNAME>:9003` |
 | Audiobookshelf | `apps/audiobookshelf` | `http://pi:13378` | `https://<TS_HOSTNAME>:9004` |
-| Home Assistant | `apps/home_assistant` | `http://pi:8123`  | `https://<TS_HOSTNAME>:9002` |
-| Dozzle         | `apps/dozzle`         | `http://pi:8080`  | `https://<TS_HOSTNAME>:9001` |
 | Caddy          | `apps/caddy`          | n/a               | Serves the HTTPS URLs above  |
 
-Caddy's routes are in `apps/caddy/conf/Caddyfile`. It uses host networking and
-the host's `tailscaled` socket for the `*.ts.net` certificate. If Tailscale is
+Each service gets its own HTTPS port on the tailnet, from 9001 upwards. Routes
+are in `apps/caddy/conf/Caddyfile`. Caddy uses host networking and the host's
+`tailscaled` socket for the `*.ts.net` certificate. If Tailscale is
 updated or restarted and the HTTPS URLs stop working, run
 `./homelab.sh restart caddy`.
+
+### Adding a service
+
+1. Create `apps/<name>/compose.yml`. Put its data under `/mnt/nvme/<name>/`,
+   give it a `container_name`, `restart: unless-stopped` and a healthcheck.
+2. For tailnet HTTPS, add a block to `apps/caddy/conf/Caddyfile` on the next
+   free port (`{$TS_HOSTNAME}:9005 { reverse_proxy localhost:<port> }`).
+3. Add a row to the table above, push, and run `./homelab.sh deploy`.
 
 ## Layout
 
 ```
+homelab.sh                   deploy and manage everything (see Usage)
 apps/<service>/compose.yml   one Compose project per service
-host/                        config installed on the Pi itself (outside Docker)
+apps/caddy/conf/Caddyfile    tailnet HTTPS routes
+host/                        config for the Pi itself (outside Docker)
+.env.example                 template for the gitignored .env on the Pi
 ```
 
 ## Storage on the Pi
