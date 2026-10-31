@@ -3,31 +3,30 @@
 #
 # {$TS_HOSTNAME} comes from .env at the repo root (see .env.example).
 # Apps are reached on localhost because the container uses host networking.
+#
+# One HTTPS port per service, 9001 upwards. Keep the README table in sync.
 
+# Bare hostname: quick check that Caddy is serving.
 {$TS_HOSTNAME} {
-	redir /jellyfin /jellyfin/
-	redir /audiobookshelf /audiobookshelf/
-
-	handle_path /jellyfin/* {
-		reverse_proxy localhost:8096
-	}
-
-	handle_path /audiobookshelf/* {
-		reverse_proxy localhost:13378
-	}
-
-	handle {
-		respond "Caddy is up." 200
-	}
-}
-
-# Apps that don't work under a sub-path get their own port instead.
-# Home Assistant
-{$TS_HOSTNAME}:8443 {
-	reverse_proxy localhost:8123
+	respond "Caddy is up." 200
 }
 
 # Dozzle
-{$TS_HOSTNAME}:8444 {
+{$TS_HOSTNAME}:9001 {
 	reverse_proxy localhost:8080
+}
+
+# Home Assistant
+{$TS_HOSTNAME}:9002 {
+	reverse_proxy localhost:8123
+}
+
+# Jellyfin
+{$TS_HOSTNAME}:9003 {
+	reverse_proxy localhost:8096
+}
+
+# Audiobookshelf
+{$TS_HOSTNAME}:9004 {
+	reverse_proxy localhost:13378
 }

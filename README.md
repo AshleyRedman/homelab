@@ -21,13 +21,13 @@ for a few seconds.
 
 ## Services
 
-| Service        | Folder                | LAN               | Tailnet (HTTPS via Caddy)              |
-| -------------- | --------------------- | ----------------- | -------------------------------------- |
-| Jellyfin       | `apps/jellyfin`       | `http://pi:8096`  | `https://<TS_HOSTNAME>/jellyfin`       |
-| Audiobookshelf | `apps/audiobookshelf` | `http://pi:13378` | `https://<TS_HOSTNAME>/audiobookshelf` |
-| Home Assistant | `apps/home_assistant` | `http://pi:8123`  | `https://<TS_HOSTNAME>:8443`           |
-| Dozzle         | `apps/dozzle`         | `http://pi:8080`  | `https://<TS_HOSTNAME>:8444`           |
-| Caddy          | `apps/caddy`          | n/a               | Serves the HTTPS URLs above            |
+| Service        | Folder                | LAN               | Tailnet (HTTPS via Caddy)    |
+| -------------- | --------------------- | ----------------- | ---------------------------- |
+| Jellyfin       | `apps/jellyfin`       | `http://pi:8096`  | `https://<TS_HOSTNAME>:9003` |
+| Audiobookshelf | `apps/audiobookshelf` | `http://pi:13378` | `https://<TS_HOSTNAME>:9004` |
+| Home Assistant | `apps/home_assistant` | `http://pi:8123`  | `https://<TS_HOSTNAME>:9002` |
+| Dozzle         | `apps/dozzle`         | `http://pi:8080`  | `https://<TS_HOSTNAME>:9001` |
+| Caddy          | `apps/caddy`          | n/a               | Serves the HTTPS URLs above  |
 
 Caddy's routes are in `apps/caddy/conf/Caddyfile`. It uses host networking and
 the host's `tailscaled` socket for the `*.ts.net` certificate. If Tailscale is
